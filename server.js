@@ -52,7 +52,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Leer localhost de variables y puerto
-const host = process.env.HOST || 0.0.0.0;
+const host = process.env.HOST;
 const port = process.env.PORT || 4000;
 
 // listen to port
