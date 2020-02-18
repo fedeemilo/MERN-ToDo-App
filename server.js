@@ -21,8 +21,9 @@ let Todo = require('./models/todo_model');
 app.use(cors());
 app.use(bodyParser.json());
 
-const MONGODB_URI =
-	'mongodb+srv://fedeemilo:gracias2020@cluster0-9zuxs.mongodb.net/todoListdb?retryWrites=true&w=majority';
+
+console.log(process.env.MONGODB_URI);
+
 
 // connect to database
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/todos', {
@@ -49,8 +50,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Leer localhost de variables y puerto
-const host = process.env.HOST || '0.0.0.0.';
-const port  = process.env.PORT || 3000; 
+const host = process.env.HOST;
+const port  = process.env.PORT || 4000; 
 
 // listen to port
 app.listen(port, host, () => {
