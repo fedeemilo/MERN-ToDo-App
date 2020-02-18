@@ -5,6 +5,11 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const path = require('path');
 
+// Importar variables de entorno
+require('dotenv').config({ path: './variables.env' });
+
+console.log(process.env.DB_URL);
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -43,7 +48,11 @@ if (process.env.NODE_ENV === 'production') {
 	});
 }
 
+// Leer localhost de variables y puerto
+const host = process.env.HOST || '0.0.0.0.';
+const port  = process.env.PORT || 3000; 
+
 // listen to port
-app.listen(PORT, () => {
-	console.log('Server is running on Port: ' + PORT);
+app.listen(port, host, () => {
+	console.log('Server is running on Port: ' + port);
 });
