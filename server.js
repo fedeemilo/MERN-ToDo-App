@@ -28,10 +28,14 @@ app.use(bodyParser.json());
 console.log(process.env.MONGODB_URI);
 
 // connect to database
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/todos', {
-	useNewUrlParser: true,
-	useUnifiedTopology: true
-});
+mongoose.connect(
+	'mongodb+srv://fedeemilo:gracias2020@cluster0-9zuxs.mongodb.net/todoListdb?retryWrites=true&w=majority' ||
+		'mongodb://localhost:27017/todos',
+	{
+		useNewUrlParser: true,
+		useUnifiedTopology: true
+	}
+);
 const connection = mongoose.connection;
 
 connection.once('open', () => {
