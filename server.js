@@ -6,7 +6,11 @@ const morgan = require('morgan');
 const path = require('path');
 
 // Importar variables de entorno
-require('dotenv').config({ path: './variables.env' });
+
+require('dotenv').config({
+	silent: process.env.NODE_ENV === 'production',
+	path: './variables.env'
+});
 
 console.log(process.env.DB_URL);
 
@@ -21,9 +25,7 @@ let Todo = require('./models/todo_model');
 app.use(cors());
 app.use(bodyParser.json());
 
-
 console.log(process.env.MONGODB_URI);
-
 
 // connect to database
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/todos', {
@@ -51,7 +53,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Leer localhost de variables y puerto
 const host = process.env.HOST;
-const port  = process.env.PORT || 4000; 
+const port = process.env.PORT || 4000;
 
 // listen to port
 app.listen(port, host, () => {
