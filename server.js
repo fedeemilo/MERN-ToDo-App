@@ -7,10 +7,10 @@ const path = require('path');
 
 // Importar variables de entorno
 
-require('dotenv').config({
-	silent: process.env.NODE_ENV === 'production',
-	path: './variables.env'
-});
+// require('dotenv').config({
+// 	silent: process.env.NODE_ENV === 'production',
+// 	path: './variables.env'
+// });
 
 console.log(process.env.DB_URL);
 
