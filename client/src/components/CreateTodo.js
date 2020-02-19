@@ -74,14 +74,15 @@ class CreateTodo extends Component {
 			todo_priority: '',
 			todo_completed: false
 		});
+
 	}
 
 	render() {
 		return (
-			<div className='mt-3 text-white'>
+			<div className='mt-4 text-white ml-5'>
 				<h3 className='text-center mt-2'>Create New Todo</h3>
 				<Row>
-					<Col md={6} className='mx-auto'>
+					<Col md={9} className='mx-auto'>
 						<Form className='mt-4' onSubmit={this.onSubmit}>
 							<FormGroup>
 								<Label className='float-left' for='todoNew'>

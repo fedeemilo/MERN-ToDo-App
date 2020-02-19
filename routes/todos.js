@@ -2,7 +2,7 @@ const Todo = require('../models/todo_model');
 const express = require('express');
 const router = express.Router();
 
-// list of todos
+// GET list of todos /todos
 router.get('/', (req, res) => {
 	Todo.find((err, todos) => {
 		if (err) {
@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
 	});
 });
 
-// show todo
+// GET show todo /todos/:id
 router.get('/:id', (req, res) => {
 	let id = req.params.id;
 	Todo.findById(id, (err, todo) => {
@@ -21,7 +21,7 @@ router.get('/:id', (req, res) => {
 	});
 });
 
-// create todo
+// POST create todo /todos/add
 router.post('/add', (req, res) => {
 	// create new instance of Todo
 	let todo = new Todo(req.body);
@@ -36,7 +36,7 @@ router.post('/add', (req, res) => {
 		});
 });
 
-// update todo
+// POST update todo /todos/update/:id
 router.post('/update/:id', (req, res) => {
 	Todo.findById(req.params.id, (err, todo) => {
 		if (!todo) {
@@ -60,6 +60,19 @@ router.post('/update/:id', (req, res) => {
 	});
 });
 
+// DELETE destroy todo /todos/:id
+router.delete('/:id', async(req, res) => {
+	let _id = req.params.id;
+	
+	try {
+		const todo = await Todo.findByIdAndDelete({_id});
+		res.json(todo);
+	} catch(e) {
+		return res.status(400).json({
+			mensaje: 'Ocurrio un error',
+			error
+		})
+	}
+});
+
 module.exports = router;
-
-

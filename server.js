@@ -7,19 +7,17 @@ const path = require('path');
 
 // Importar variables de entorno
 
-// require('dotenv').config({
-// 	silent: process.env.NODE_ENV === 'production',
-// 	path: './variables.env'
-// });
+require('dotenv').config({
+	silent: process.env.NODE_ENV === 'production',
+	path: './variables.env'
+});
 
 console.log(process.env.DB_URL);
 
 const app = express();
-const PORT = process.env.PORT || 4000;
 
 const todosRoutes = require('./routes/todos');
-
-let Todo = require('./models/todo_model');
+const categorieRoutes = require('./routes/categories');
 
 // app.use(morgan('tiny'));
 app.use(cors());
@@ -28,14 +26,10 @@ app.use(bodyParser.json());
 console.log(process.env.MONGODB_URI);
 
 // connect to database
-mongoose.connect(
-	'mongodb+srv://fedeemilo:gracias2020@cluster0-9zuxs.mongodb.net/todoListdb?retryWrites=true&w=majority' ||
-		'mongodb://localhost:27017/todos',
-	{
-		useNewUrlParser: true,
-		useUnifiedTopology: true
-	}
-);
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/todos', {
+	useNewUrlParser: true,
+	useUnifiedTopology: true
+});
 const connection = mongoose.connection;
 
 connection.once('open', () => {
@@ -44,6 +38,7 @@ connection.once('open', () => {
 
 // mount routes
 app.use('/todos', todosRoutes);
+app.use('/categories', categorieRoutes);
 
 // this is to check if my app is on heroku
 if (process.env.NODE_ENV === 'production') {

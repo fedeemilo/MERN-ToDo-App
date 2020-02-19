@@ -27,3 +27,4 @@ yarn-error.log*
 
 variables.env
 /lib
+.now

@@ -21,3 +21,16 @@ body {
 	right: 0;
 	top: 44%;
 }
+
+.c-pointer {
+	position: relative;
+	top: 3.5px;
+	left: 5px;
+}
+
+.c-pointer:hover {
+	cursor: pointer;
+	background: red;
+
+	
+}

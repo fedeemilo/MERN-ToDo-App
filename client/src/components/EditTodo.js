@@ -87,7 +87,7 @@ class EditTodo extends Component {
 
 	render() {
 		return (
-			<div>
+			<div className='create-todo'>
 				<h3 className='mt-3'>Update Todo</h3>
 
 				<Row>
