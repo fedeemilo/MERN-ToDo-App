@@ -26,11 +26,25 @@ body {
 	position: relative;
 	top: 3.5px;
 	left: 5px;
+
+	&:hover {
+		cursor: pointer;
+		background: red;
+	}
 }
 
-.c-pointer:hover {
-	cursor: pointer;
-	background: red;
+.categorie-list-element {
+	&:hover {
+		opacity: 0.7;
+		cursor: pointer;
+	}
+}
 
+.arrDown {
+	width: 30px;
+	filter: invert(70%); 
 	
+	&:hover {
+		cursor: pointer;
+	}
 }

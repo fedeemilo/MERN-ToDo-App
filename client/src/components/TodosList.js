@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import AppDropdown from './AppDropdown';
 import {
 	Table,
 	Row,
@@ -13,7 +14,11 @@ import {
 	ListGroup,
 	ListGroupItem,
 	Alert,
-	Badge
+	Badge,
+	ButtonDropdown,
+	DropdownToggle,
+	DropdownMenu,
+	DropdownItem
 } from 'reactstrap';
 import CreateTodo from '../components/CreateTodo';
 
@@ -39,6 +44,8 @@ const Todo = (props) => (
 			>
 				Delete
 			</Link>
+			{/* <img src={arrowDown} className='arrDown' /> */}
+			<AppDropdown />
 		</td>
 	</tr>
 );
@@ -52,10 +59,10 @@ class TodosList extends Component {
 		this.handleShow = this.handleShow.bind(this);
 		this.handleShowCateg = this.handleShowCateg.bind(this);
 		this.handleHideCateg = this.handleHideCateg.bind(this);
+		this.handleCategInput = this.handleCategInput.bind(this);
 		this.handleCategSubmit = this.handleCategSubmit.bind(this);
+		this.handleCategDelete = this.handleCategDelete.bind(this);
 		this.listCategories = this.listCategories.bind(this);
-		this.handleMouseHover = this.handleMouseHover.bind(this);
-		this.handleMouseLeave = this.handleMouseLeave.bind(this);
 
 		this.state = {
 			todos: [],
@@ -64,25 +71,26 @@ class TodosList extends Component {
 			colSize: 12,
 			categories: [],
 			newCateg: '',
-			focusCateg: false,
 			emptyCateg: false,
-			deleteCateg: false
+			deleteCateg: false,
+			categorie_todos: []
 		};
 	}
 
-	componentDidMount() {
+	componentDidMount = async () => {
 		// mount the list of todos to the satate
-		axios
-			.get('http://localhost:4000/todos/')
+		await axios
+			.get('http://localhost:4000/todos')
 			.then((res) => {
 				this.setState({ todos: res.data });
 			})
 			.catch((err) => {
 				console.log(err);
+				return null;
 			});
 
-		axios
-			.get('http://localhost:4000/categories/')
+		await axios
+			.get('http://localhost:4000/categories')
 			.then((res) => {
 				console.log(res);
 				console.log(typeof res.data);
@@ -90,46 +98,52 @@ class TodosList extends Component {
 			})
 			.catch((err) => {
 				console.log(err);
+				return null;
 			});
-	}
+	};
 
-	componentDidUpdate() {
+	componentDidUpdate = async () => {
 		// update the list of todos
-		axios
+		await axios
 			.get('http://localhost:4000/todos/')
 			.then((res) => {
 				this.setState({ todos: res.data });
 			})
 			.catch((err) => {
 				console.log(err);
+				return null;
 			});
 
-		axios.get('http://localhost:4000/categories/').then((res) => {
-			this.setState({ categories: res.data });
-		});
-	}
+		await axios
+			.get('http://localhost:4000/categories/')
+			.then((res) => {
+				this.setState({ categories: res.data });
+			})
+			.catch((err) => {
+				console.log(err);
+				return null;
+			});
+	};
 
+	// List the todos inside a table
 	todoList() {
 		return this.state.todos.map((currentTodo, i) => {
 			return <Todo todo={currentTodo} key={i} deleteTodo={this.handleDelete} />;
 		});
 	}
 
-	handleMouseHover(e) {}
-
-	handleMouseLeave(e) {}
-
 	listCategories() {
 		return this.state.categories.map((categ) => {
 			return (
-				<ListGroupItem
-					onMouseEnter={(e) => this.handleMouseHover(e)}
-					onMouseLeave={(e) => this.handleMouseLeave(e)}
-					className='categorie-list-element'
-				>
+				<ListGroupItem className='categorie-list-element'>
 					{categ.categorie_name}
 
-					<Badge color='secondary' className='float-right c-pointer'>
+					<Badge
+						color='secondary'
+						id={categ._id}
+						onClick={(e) => this.handleCategDelete(e)}
+						className='float-right c-pointer'
+					>
 						X
 					</Badge>
 				</ListGroupItem>
@@ -137,14 +151,20 @@ class TodosList extends Component {
 		});
 	}
 
-	handleDelete(id, e) {
+	handleDelete = async (id, e) => {
 		e.preventDefault();
 		console.log(id);
-		axios.delete('http://localhost:4000/todos/' + id).then((res) => {
-			console.log(res);
-			console.log(res.data);
-		});
-	}
+		await axios
+			.delete('http://localhost:4000/todos/' + id)
+			.then((res) => {
+				console.log(res);
+				console.log(res.data);
+			})
+			.catch((err) => {
+				console.log(err);
+				return null;
+			});
+	};
 
 	handleShow() {
 		this.setState({ isActive: true, colSize: 6 });
@@ -164,35 +184,51 @@ class TodosList extends Component {
 
 	handleCategInput(e) {
 		this.setState({ newCateg: e.target.value });
-		console.log(this.state.newCateg);
 	}
 
-	handleCategSubmit(e) {
+	handleCategSubmit = async (e) => {
 		e.preventDefault();
 		let inputCateg = document.getElementById('createCategory');
 		if (inputCateg.value.length == 0) {
 			this.setState({ emptyCateg: true });
-			setInterval(() => {
-				this.setState({ emptyCateg: false });
-			}, 4000);
 			return;
 		}
 
 		// Creo el objeto categoría
 		const categ = {
 			categorie_name: this.state.newCateg,
-			categorie_focus: false
+			categorie_todos: this.state.categorie_todos
 		};
 
+		console.log(this.state.categorie_todos);
+
 		// Utilizo axios para agregar la categoría a la base de datos
-		axios
+		await axios
 			.post('http://localhost:4000/categories/add', categ)
-			.then((res) => console.log(res.data));
+			.then((res) => console.log(res.data))
+			.catch((err) => {
+				console.log(err);
+				return null;
+			});
 
 		this.setState({ newCateg: '' });
+		this.setState({ emptyCateg: false });
 
 		inputCateg.value = '';
-	}
+	};
+
+	handleCategDelete = async (e) => {
+		await axios
+			.delete('http://localhost:4000/categories/' + e.target.id)
+			.then((res) => {
+				console.log(res);
+				console.log(res.data);
+			})
+			.catch((err) => {
+				console.log(err);
+				return null;
+			});
+	};
 
 	render() {
 		return (
@@ -252,11 +288,11 @@ class TodosList extends Component {
 							</Button>
 						) : null}
 					</Col>
-					<Col xs={4} className='mx-auto mt-4'>
+					<Col xs={4} className='mx-auto mt-5'>
 						{this.state.isActiveCateg ? (
 							<Form onSubmit={(e) => this.handleCategSubmit(e)}>
 								<FormGroup>
-									<Label for='createCategory'>Category</Label>
+									<Label for='createCategory'>New Category</Label>
 									<Input
 										type='text'
 										name='category'
@@ -271,17 +307,31 @@ class TodosList extends Component {
 					</Col>
 					<Col xs={4}>
 						<h4 className='mb-3'>Categories</h4>
-						<ListGroup className='text-dark'>{this.listCategories()}</ListGroup>
+						{this.state.categories.length > 0 ? (
+							<ListGroup className='text-dark'>
+								{this.listCategories()}
+							</ListGroup>
+						) : (
+							<ListGroup className='text-dark'>
+								<Alert
+									color='info'
+									style={{ transition: '2s' }}
+									className='mx-auto mt-4'
+								>
+									No hay categorías cargadas
+								</Alert>
+							</ListGroup>
+						)}
+						{this.state.emptyCateg ? (
+							<Alert
+								color='warning'
+								style={{ transition: '2s' }}
+								className='mx-auto mt-1'
+							>
+								The category input cannot be empty!
+							</Alert>
+						) : null}
 					</Col>
-					{this.state.emptyCateg ? (
-						<Alert
-							color='warning'
-							style={{ transition: '2s' }}
-							className='mx-auto mt-4'
-						>
-							The category input cannot be empty!
-						</Alert>
-					) : null}
 				</Row>
 			</div>
 		);

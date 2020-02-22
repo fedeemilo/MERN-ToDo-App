@@ -5,9 +5,12 @@ let Categorie = new Schema({
 	categorie_name: {
 		type: String
 	},
-	categorie_focus: {
-		type: Boolean
-	}
+	categorie_todos: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'Todo'
+		}
+	]
 });
 
 module.exports = mongoose.model('Categorie', Categorie);
