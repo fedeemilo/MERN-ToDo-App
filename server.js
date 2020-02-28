@@ -2,8 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const morgan = require('morgan');
 const path = require('path');
+
+
 
 // Importar variables de entorno
 
@@ -53,6 +54,8 @@ if (process.env.NODE_ENV === 'production') {
 // Leer localhost de variables y puerto
 const host = process.env.HOST;
 const port = process.env.PORT || 4000;
+
+
 
 // listen to port
 app.listen(port, host, () => {

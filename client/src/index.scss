@@ -19,7 +19,7 @@ body {
 	margin-top: calc(0.125em / 2 * -1);
 	position: absolute;
 	right: 0;
-	top: 44%;
+	top: 36%;
 }
 
 .c-pointer {
@@ -42,9 +42,13 @@ body {
 
 .arrDown {
 	width: 30px;
-	filter: invert(70%); 
-	
+	filter: invert(70%);
+
 	&:hover {
 		cursor: pointer;
 	}
+}
+
+.list-group {
+	flex-direction: row;
 }

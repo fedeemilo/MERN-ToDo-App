@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
 	Col,
@@ -11,88 +11,74 @@ import {
 	CustomInput
 } from 'reactstrap';
 
-class EditTodo extends Component {
-	constructor(props) {
-		super(props);
+function EditTodo(todos) {
+	const [todoDescription, setTodoDescription] = useState('');
+	const [todoResponsible, setTodoResponsible] = useState('');
+	const [todoPriority, setTodoPriority] = useState('');
+	const [todoCompleted, setTodoCompleted] = useState(false);
 
-		this.onChangeTodoDescription = this.onChangeTodoDescription.bind(this);
-		this.onChangeTodoResponsible = this.onChangeTodoResponsible.bind(this);
-		this.onChangeTodoPriority = this.onChangeTodoPriority.bind(this);
-		this.onChangeTodoCompleted = this.onChangeTodoCompleted.bind(this);
-		this.onSubmit = this.onSubmit.bind(this);
+	console.log(todos.params)
 
-		this.state = {
-			todo_description: '',
-			todo_responsible: '',
-			todo_priority: '',
-			todo_completed: false
-		};
-	}
+	useEffect(() => {
+		fetchTodo();
+	}, []);
 
-	componentDidMount() {
+	function fetchTodo() {
 		axios
-			.get('http://localhost:4000/todos/' + this.props.match.params.id)
+			.get('/todos/' + todos.match.params.id)
 			.then((res) => {
-				this.setState({
-					todo_description: res.data.todo_description,
-					todo_responsible: res.data.todo_responsible,
-					todo_priority: res.data.todo_priority,
-					todo_completed: res.data.todo_completed
-				});
-				console.log(this);
+				setTodoDescription(res.data.todo_description);
+				setTodoResponsible(res.data.todo_responsible);
+				setTodoPriority(res.data.todo_priority);
+				setTodoCompleted(res.data.todo_completed);
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	}
 
-	onChangeTodoDescription(e) {
-		this.setState({
-			todo_description: e.target.value
-		});
+	function onChangeTodoDescription(e) {
+		setTodoDescription(e.target.value);
 	}
 
-	onChangeTodoResponsible(e) {
-		this.setState({
-			todo_responsible: e.target.value
-		});
+	function onChangeTodoResponsible(e) {
+		setTodoResponsible(e.target.value);
 	}
 
-	onChangeTodoPriority(e) {
-		this.setState({
-			todo_priority: e.target.value
-		});
+	function onChangeTodoPriority(e) {
+		setTodoPriority(e.target.value);
 	}
 
-	onChangeTodoCompleted(e) {
-		this.setState({
-			todo_completed: !this.state.todo_completed
-		})
+	function onChangeTodoCompleted(e) {
+		setTodoCompleted(e.target.value);
 	}
 
-	onSubmit(e) {
+	function onSubmit(e) {
 		e.preventDefault();
 		const obj = {
-			todo_description: this.state.todo_description,
-			todo_responsible: this.state.todo_responsible,
-			todo_priority:	  this.state.todo_priority,
-			todo_completed:   this.state.todo_completed
-		}
-		axios.post('http://localhost:4000/todos/update/'+this.props.match.params.id, obj)
-			 .then(res => console.log(res.data));
+			todo_description: todoDescription,
+			todo_responsible: todoResponsible,
+			todo_priority: todoPriority,
+			todo_completed: todoCompleted
+		};
+		axios
+			.put('/todos/update/' + todos.match.params.id, obj)
+			.then((res) => console.log(res.data))
+			.catch(err => {
+				console.log(err);
+			});
 		
-		this.props.history.push('/');
+		todos.history.push('/');
 	}
 
 
-	render() {
 		return (
 			<div className='create-todo'>
 				<h3 className='mt-3'>Update Todo</h3>
 
 				<Row>
 					<Col md={6} className='mx-auto'>
-						<Form className='mt-4' onSubmit={this.onSubmit}>
+						<Form className='mt-4' onSubmit={onSubmit}>
 							<FormGroup>
 								<Label className='float-left' for='todoNew'>
 									Description:
@@ -101,8 +87,8 @@ class EditTodo extends Component {
 									type='text'
 									name='todoNew'
 									id='todoNew'
-									value={this.state.todo_description}
-									onChange={this.onChangeTodoDescription}
+									value={todoDescription}
+									onChange={onChangeTodoDescription}
 								/>
 							</FormGroup>
 							<FormGroup>
@@ -113,12 +99,12 @@ class EditTodo extends Component {
 									type='text'
 									name='todoResponsible'
 									id='todoResponsible'
-									value={this.state.todo_responsible}
-									onChange={this.onChangeTodoResponsible}
+									value={todoResponsible}
+									onChange={onChangeTodoResponsible}
 								/>
 							</FormGroup>
 							<FormGroup>
-								<Label for="priorityOptions"></Label>
+								<Label for='priorityOptions'></Label>
 								<div className='form-check form-check-inline float-left'>
 									<CustomInput
 										type='radio'
@@ -127,8 +113,8 @@ class EditTodo extends Component {
 										label='Low'
 										className='mx-2'
 										value='Low'
-										checked={this.state.todo_priority === 'Low'}
-										onChange={this.onChangeTodoPriority}
+										checked={todoPriority === 'Low'}
+										onChange={onChangeTodoPriority}
 									/>
 									<CustomInput
 										type='radio'
@@ -137,8 +123,8 @@ class EditTodo extends Component {
 										label='Medium'
 										className='mx-2'
 										value='Medium'
-										checked={this.state.todo_priority === 'Medium'}
-										onChange={this.onChangeTodoPriority}
+										checked={todoPriority === 'Medium'}
+										onChange={onChangeTodoPriority}
 									/>
 									<CustomInput
 										type='radio'
@@ -147,8 +133,8 @@ class EditTodo extends Component {
 										label='High'
 										className='mx-2'
 										value='High'
-										checked={this.state.todo_priority === 'High'}
-										onChange={this.onChangeTodoPriority}
+										checked={todoPriority === 'High'}
+										onChange={onChangeTodoPriority}
 									/>
 								</div>
 							</FormGroup>
@@ -157,10 +143,10 @@ class EditTodo extends Component {
 									type='checkbox'
 									id='completedCheckbox'
 									label='Completed'
-									className="mt-2 ml-2 float-left"
-									onChange={this.onChangeTodoCompleted}
-									checked={this.state.todo_completed}
-									value={this.state.todo_completed}
+									className='mt-2 ml-2 float-left'
+									onChange={onChangeTodoCompleted}
+									checked={todoCompleted}
+									value={todoCompleted}
 								/>
 							</FormGroup>
 							<FormGroup className=' float-right'>
@@ -171,7 +157,6 @@ class EditTodo extends Component {
 				</Row>
 			</div>
 		);
-	}
 }
 
 export default EditTodo;

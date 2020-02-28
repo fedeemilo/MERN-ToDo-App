@@ -5,7 +5,7 @@ const { asyncErrorHandler } = require('../middleware/index');
 const {
 	todoIndex,
 	todoPost,
-	todoCreate,
+	todoUpdate,
 	todoDelete,
 	todoShow
 } = require('../controllers/todos');
@@ -20,7 +20,7 @@ router.get('/:id', asyncErrorHandler(todoShow));
 router.post('/add', asyncErrorHandler(todoPost));
 
 // POST update todo /todos/update/:id
-router.post('/update/:id', asyncErrorHandler(todoCreate));
+router.put('/update/:id', asyncErrorHandler(todoUpdate));
 
 // DELETE destroy todo /todos/:id
 router.delete('/:id', asyncErrorHandler(todoDelete));

@@ -1,0 +1,49 @@
+@import url("https://fonts.googleapis.com/css?family=Lemonada|Sriracha&display=swap");
+body {
+  margin: 0;
+  font-family: 'Lemonada', cursive !important;
+  background: #343a40 !important;
+}
+
+.completed {
+  font-size: 1em;
+  line-height: 1em;
+  position: relative;
+}
+
+.completed::after {
+  border-bottom: 0.125em solid #6cc255;
+  content: '';
+  left: 0;
+  margin-top: calc(0.125em / 2 * -1);
+  position: absolute;
+  right: 0;
+  top: 36%;
+}
+
+.c-pointer {
+  position: relative;
+  top: 3.5px;
+  left: 5px;
+}
+
+.c-pointer:hover {
+  cursor: pointer;
+  background: red;
+}
+
+.categorie-list-element:hover {
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.arrDown {
+  width: 30px;
+  -webkit-filter: invert(70%);
+          filter: invert(70%);
+}
+
+.arrDown:hover {
+  cursor: pointer;
+}
+/*# sourceMappingURL=index.css.map */

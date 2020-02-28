@@ -12,9 +12,13 @@ const AppDropdown = (props) => {
            
       </DropdownToggle>
       <DropdownMenu>
-        <DropdownItem header>Categories</DropdownItem>
-        <DropdownItem>Another Action</DropdownItem>
-
+        <DropdownItem className='mb-n1' style={{fontSize: '1rem'}} header>Categories</DropdownItem>
+        
+        {props.categs.map((currentCateg, i) =>{
+          return (
+            <DropdownItem>{currentCateg.categorie_name}</DropdownItem>
+          )
+        })}
       </DropdownMenu>
     </ButtonDropdown>
   );

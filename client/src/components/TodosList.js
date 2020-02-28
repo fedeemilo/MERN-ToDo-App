@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import AppDropdown from './AppDropdown';
@@ -15,327 +15,381 @@ import {
 	ListGroupItem,
 	Alert,
 	Badge,
-	ButtonDropdown,
-	DropdownToggle,
-	DropdownMenu,
-	DropdownItem
+	CustomInput
 } from 'reactstrap';
-import CreateTodo from '../components/CreateTodo';
 
-const Todo = (props) => (
-	<tr>
-		<td className={props.todo.todo_completed ? 'completed' : ''}>
-			{props.todo.todo_description}
-		</td>
-		<td className={props.todo.todo_completed ? 'completed' : ''}>
-			{props.todo.todo_responsible}
-		</td>
-		<td className={props.todo.todo_completed ? 'completed' : ''}>
-			{props.todo.todo_priority}
-		</td>
-		<td>
-			<Link to={'/edit/' + props.todo._id} className='mr-2 text-warning'>
-				Edit
-			</Link>
-			<Link
-				to={'/'}
-				className='text-danger'
-				onClick={(e) => props.deleteTodo(props.todo._id, e)}
-			>
-				Delete
-			</Link>
-			{/* <img src={arrowDown} className='arrDown' /> */}
-			<AppDropdown />
-		</td>
-	</tr>
-);
+function TodosList(props) {
+	const [todos, setTodos] = useState([]);
+	const [categorieTodos, setCategorieTodos] = useState([]);
+	const [isActive, setIsActive] = useState(false);
+	const [isActiveCateg, setIsActiveCateg] = useState(false);
+	const [colSize, setColSize] = useState(12);
+	const [newCateg, setNewCateg] = useState('');
+	const [todoDescription, setTodoDescription] = useState('');
+	const [todoResponsible, setTodoResponsible] = useState('');
+	const [todoPriority, setTodoPriority] = useState('');
+	const [todoCompleted, setTodoCompleted] = useState(false);
+	// const [deleteCateg, setDeleteCateg] = useState(false);
+	const [todoCreated, setTodoCreated] = useState(false);
+	const [todoEliminated, setTodoEliminated] = useState(false);
+	const [emptyCateg, setEmptyCateg] = useState(false);
+	const [categories, setCategories] = useState([]);
+	const prevTodos = usePrevious(todos);
 
-class TodosList extends Component {
-	constructor(props) {
-		super(props);
-
-		this.handleDelete = this.handleDelete.bind(this);
-		this.handleHide = this.handleHide.bind(this);
-		this.handleShow = this.handleShow.bind(this);
-		this.handleShowCateg = this.handleShowCateg.bind(this);
-		this.handleHideCateg = this.handleHideCateg.bind(this);
-		this.handleCategInput = this.handleCategInput.bind(this);
-		this.handleCategSubmit = this.handleCategSubmit.bind(this);
-		this.handleCategDelete = this.handleCategDelete.bind(this);
-		this.listCategories = this.listCategories.bind(this);
-
-		this.state = {
-			todos: [],
-			isActive: false,
-			isActiveCateg: false,
-			colSize: 12,
-			categories: [],
-			newCateg: '',
-			emptyCateg: false,
-			deleteCateg: false,
-			categorie_todos: []
-		};
-	}
-
-	componentDidMount = async () => {
-		// mount the list of todos to the satate
-		await axios
-			.get('http://localhost:4000/todos')
-			.then((res) => {
-				this.setState({ todos: res.data });
-			})
-			.catch((err) => {
-				console.log(err);
-				return null;
-			});
-
-		await axios
-			.get('http://localhost:4000/categories')
-			.then((res) => {
-				console.log(res);
-				console.log(typeof res.data);
-				this.setState({ categories: res.data });
-			})
-			.catch((err) => {
-				console.log(err);
-				return null;
-			});
-	};
-
-	componentDidUpdate = async () => {
-		// update the list of todos
-		await axios
-			.get('http://localhost:4000/todos/')
-			.then((res) => {
-				this.setState({ todos: res.data });
-			})
-			.catch((err) => {
-				console.log(err);
-				return null;
-			});
-
-		await axios
-			.get('http://localhost:4000/categories/')
-			.then((res) => {
-				this.setState({ categories: res.data });
-			})
-			.catch((err) => {
-				console.log(err);
-				return null;
-			});
-	};
-
-	// List the todos inside a table
-	todoList() {
-		return this.state.todos.map((currentTodo, i) => {
-			return <Todo todo={currentTodo} key={i} deleteTodo={this.handleDelete} />;
-		});
-	}
-
-	listCategories() {
-		return this.state.categories.map((categ) => {
-			return (
-				<ListGroupItem className='categorie-list-element'>
-					{categ.categorie_name}
-
-					<Badge
-						color='secondary'
-						id={categ._id}
-						onClick={(e) => this.handleCategDelete(e)}
-						className='float-right c-pointer'
+	function Todo(todos) {
+		return (
+			<tr>
+				<td className={todos.todo.todo_completed ? 'completed' : ''}>
+					{todos.todo.todo_description}
+				</td>
+				<td className={todoCompleted ? 'completed' : ''}>
+					{todos.todo.todo_responsible}
+				</td>
+				<td className={todos.todo_completed ? 'completed' : ''}>
+					{todos.todo.todo_priority}
+				</td>
+				<td>
+					<Link to={'/edit/' + todos.todo._id} className='mr-2 text-warning'>
+						Edit
+					</Link>
+					<Link
+						to={'/'}
+						className='text-danger'
+						onClick={(e) => todos.deleteTodo(e, todos.todo._id)}
 					>
-						X
-					</Badge>
-				</ListGroupItem>
+						Delete
+					</Link>
+				</td>
+			</tr>
+		);
+	}
+
+	useEffect(() => {
+		todosFetching();
+		console.log('Prev Todo List: ', prevTodos);
+		console.log('Original todos: ', todos);
+	}, []);
+
+	// Hook of Previous Value
+	function usePrevious(value) {
+		// The ref object is a generic container whose current property is mutable ...
+		// ... and can hold any value, similar to an instance property on a class
+		const ref = useRef();
+
+		// Store current value in ref
+		useEffect(() => {
+			ref.current = value;
+		}, [value]); // Only re-run if value changes
+
+		// Return previous value (happens before update in useEffect above)
+		return ref.current;
+	}
+
+	// Fetch the Todos
+	async function todosFetching() {
+		await axios
+			.get('/todos/')
+			.then((res) => {
+				console.log(res.data);
+				setTodos((todos) => todos.concat(res.data));
+			})
+			.catch((err) => {
+				console.log(err);
+				return null;
+			});
+
+		
+	}
+	// Handle input of Todo Description
+	function onChangeTodoDescription(e) {
+		setTodoDescription(e.target.value);
+	}
+	// Handle input of Todo Responsible
+	function onChangeTodoResponsible(e) {
+		setTodoResponsible(e.target.value);
+	}
+	// Handle input of Todo Priority
+	function onChangeTodoPriority(e) {
+		setTodoPriority(e.target.value);
+	}
+	// Handle the submittion of Todo Creation
+	async function onSubmit(e) {
+		e.preventDefault();
+		// Communication with the backend
+		// create newTodo object
+		console.log(todoDescription);
+		console.log(todoResponsible);
+		console.log(todoPriority);
+		console.log(todoCompleted);
+		const newTodo = {
+			todo_description: todoDescription,
+			todo_responsible: todoResponsible,
+			todo_priority: todoPriority,
+			todo_completed: todoCompleted
+		};
+
+		await axios
+			.post('http://localhost:4000/todos/add', newTodo)
+			.then(() => setTodos((todos) => todos.concat(newTodo)))
+			.catch((err) => {
+				console.log(err);
+			});
+
+		setTodoDescription('');
+		setTodoResponsible('');
+		setTodoPriority('');
+		setTodoCompleted(false);
+
+		setTodoCreated(true);
+		setTimeout(() => {
+			setTodoCreated(false);
+		}, 2000);
+
+		setTimeout(() => {
+			refreshPage();
+		}, 2000);
+	}
+	// List the todos inside a table
+	function listTodos() {
+		return todos.map((currentTodo, i) => {
+			return (
+				<Todo
+					index={i}
+					todo={currentTodo}
+					key={currentTodo._id}
+					deleteTodo={handleDelete}
+				/>
 			);
 		});
 	}
-
-	handleDelete = async (id, e) => {
-		e.preventDefault();
-		console.log(id);
-		await axios
-			.delete('http://localhost:4000/todos/' + id)
-			.then((res) => {
-				console.log(res);
-				console.log(res.data);
-			})
-			.catch((err) => {
-				console.log(err);
-				return null;
-			});
-	};
-
-	handleShow() {
-		this.setState({ isActive: true, colSize: 6 });
+	
+	// Show the Create Todo form
+	function handleShowCreate() {
+		setIsActive(true);
+		setColSize(6);
 	}
-
-	handleHide() {
-		this.setState({ isActive: false, colSize: 12 });
+	// Hide the Create Todo form
+	function handleHideCreate() {
+		setIsActive(false);
+		setColSize(12);
 	}
-
-	handleShowCateg() {
-		this.setState({ isActiveCateg: true });
+	// Show Categories input
+	function handleShowCateg() {
+		setIsActiveCateg(true);
 	}
-
-	handleHideCateg() {
-		this.setState({ isActiveCateg: false });
+	// Hide Categories input
+	function handleHideCateg() {
+		setIsActiveCateg(false);
 	}
-
-	handleCategInput(e) {
-		this.setState({ newCateg: e.target.value });
+	// Handle Categories input
+	function handleCategInput(e) {
+		setNewCateg(e.target.value);
 	}
-
-	handleCategSubmit = async (e) => {
+	// Handle Category Submittion
+	function handleCategSubmit(e) {
 		e.preventDefault();
 		let inputCateg = document.getElementById('createCategory');
-		if (inputCateg.value.length == 0) {
-			this.setState({ emptyCateg: true });
+		if (inputCateg.value.length === 0) {
+			setEmptyCateg(true);
 			return;
 		}
 
 		// Creo el objeto categoría
 		const categ = {
-			categorie_name: this.state.newCateg,
-			categorie_todos: this.state.categorie_todos
+			categorie_name: newCateg,
+			categorie_todos: categorieTodos
 		};
 
-		console.log(this.state.categorie_todos);
-
 		// Utilizo axios para agregar la categoría a la base de datos
-		await axios
-			.post('http://localhost:4000/categories/add', categ)
-			.then((res) => console.log(res.data))
+		axios
+			.post('/categories/add', categ)
+			.then((res) => setCategories((categories) => categories.concat(categ)))
 			.catch((err) => {
 				console.log(err);
 				return null;
 			});
 
-		this.setState({ newCateg: '' });
-		this.setState({ emptyCateg: false });
+		setNewCateg('');
+		setEmptyCateg(false);
 
 		inputCateg.value = '';
-	};
-
-	handleCategDelete = async (e) => {
+	}
+	// Handle delete of Todo
+	async function handleDelete(e, id) {
+		console.log(id);
 		await axios
-			.delete('http://localhost:4000/categories/' + e.target.id)
+			.delete('/todos/' + id)
 			.then((res) => {
 				console.log(res);
-				console.log(res.data);
+				setTodos(todos.filter((todo) => todo._id !== id));
 			})
 			.catch((err) => {
 				console.log(err);
-				return null;
 			});
-	};
 
-	render() {
-		return (
-			<div>
-				<Row>
-					<Col className='col-mide-6' xs={this.state.colSize}>
-						<h3 className='mt-4'>ToDos List</h3>
-						<Table className='mt-4 text-white'>
-							<thead>
-								<tr>
-									<th>Description</th>
-									<th>Responsible</th>
-									<th>Priority</th>
-									<th>Actions</th>
-								</tr>
-							</thead>
-							<tbody>{this.todoList()}</tbody>
-						</Table>
-					</Col>
-
-					{this.state.isActive ? (
-						<Col xs='6'>
-							<CreateTodo />
-						</Col>
-					) : null}
-				</Row>
-				<Row className='mt-3'>
-					<Col xs={4}>
-						{!this.state.isActive ? (
-							<Button outline color='secondary' onClick={this.handleShow}>
-								Show Create
-							</Button>
-						) : null}
-						{this.state.isActive ? (
-							<Button outline color='warning' onClick={this.handleHide}>
-								Hide Create
-							</Button>
-						) : null}
-						{!this.state.isActiveCateg ? (
-							<Button
-								outline
-								color='success'
-								className='ml-4'
-								onClick={this.handleShowCateg}
-							>
-								Add Category
-							</Button>
-						) : null}
-						{this.state.isActiveCateg ? (
-							<Button
-								outline
-								color='danger'
-								className='ml-4'
-								onClick={this.handleHideCateg}
-							>
-								Cancel
-							</Button>
-						) : null}
-					</Col>
-					<Col xs={4} className='mx-auto mt-5'>
-						{this.state.isActiveCateg ? (
-							<Form onSubmit={(e) => this.handleCategSubmit(e)}>
-								<FormGroup>
-									<Label for='createCategory'>New Category</Label>
-									<Input
-										type='text'
-										name='category'
-										id='createCategory'
-										placeholder='Write a category...'
-										onChange={(e) => this.handleCategInput(e)}
-									/>
-								</FormGroup>
-								<Button>Save</Button>
-							</Form>
-						) : null}
-					</Col>
-					<Col xs={4}>
-						<h4 className='mb-3'>Categories</h4>
-						{this.state.categories.length > 0 ? (
-							<ListGroup className='text-dark'>
-								{this.listCategories()}
-							</ListGroup>
-						) : (
-							<ListGroup className='text-dark'>
-								<Alert
-									color='info'
-									style={{ transition: '2s' }}
-									className='mx-auto mt-4'
-								>
-									No hay categorías cargadas
-								</Alert>
-							</ListGroup>
-						)}
-						{this.state.emptyCateg ? (
-							<Alert
-								color='warning'
-								style={{ transition: '2s' }}
-								className='mx-auto mt-1'
-							>
-								The category input cannot be empty!
-							</Alert>
-						) : null}
-					</Col>
-				</Row>
-			</div>
-		);
+		setTodoEliminated(true);
+		setTimeout(() => {
+			setTodoEliminated(false);
+		}, 2000);
 	}
+	
+	// Refresh the page
+	function refreshPage() {
+		window.location.reload(false);
+	}
+
+	return (
+		<div>
+			<Row>
+				<Col className='col-mide-6' xs={colSize}>
+					{todoCreated ? (
+							<Alert className='mt-3'  color='success'>New Todo added successfully!</Alert>
+					) : null}
+					{todoEliminated ? (
+							<Alert className='w-50 mt-3 mx-auto animated fadeIn' color='danger'>Todo deleted successfully!</Alert>
+					) : null}
+					<h3 className='mt-4'>ToDos List</h3>
+					<Table className='mt-4 text-white'>
+						<thead>
+							<tr>
+								<th>Description</th>
+								<th>Responsible</th>
+								<th>Priority</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>{listTodos()}</tbody>
+					</Table>
+				</Col>
+
+				{isActive ? (
+					<Col xs='6'>
+						<h3 className='text-center mt-2'>Create New Todo</h3>
+						<Row>
+							<Col md={9} className='mx-auto'>
+								<Form className='mt-4' onSubmit={onSubmit}>
+									<FormGroup>
+										<Label className='float-left' for='todoNew'>
+											Description:
+										</Label>
+										<Input
+											type='text'
+											name='todoNew'
+											id='todoNew'
+											value={todoDescription}
+											onChange={onChangeTodoDescription}
+										/>
+									</FormGroup>
+									<FormGroup>
+										<Label className='float-left' for='todoResponsible'>
+											Responsible:
+										</Label>
+										<Input
+											type='text'
+											name='todoResponsible'
+											id='todoResponsible'
+											value={todoResponsible}
+											onChange={onChangeTodoResponsible}
+										/>
+									</FormGroup>
+									<FormGroup>
+										<div className='form-check form-check-inline float-left'>
+											<CustomInput
+												type='radio'
+												id='priorityLow'
+												name='priorityOptions'
+												label='Low'
+												className='mx-2'
+												value='Low'
+												// checked={todo_priority === 'Low'}
+												onChange={onChangeTodoPriority}
+											/>
+											<CustomInput
+												type='radio'
+												id='priorityMedium'
+												name='priorityOptions'
+												label='Medium'
+												className='mx-2'
+												value='Medium'
+												// checked={todo_priority === 'Medium'}
+												onChange={onChangeTodoPriority}
+											/>
+											<CustomInput
+												type='radio'
+												id='priorityHigh'
+												name='priorityOptions'
+												label='High'
+												className='mx-2'
+												value='High'
+												// checked={todo_priority === 'High'}
+												onChange={onChangeTodoPriority}
+											/>
+										</div>
+									</FormGroup>
+									<FormGroup className='mt-4 float-right'>
+										<Button color='secondary'>Create</Button>
+									</FormGroup>
+								</Form>
+							</Col>
+						</Row>
+					</Col>
+				) : null}
+			</Row>
+			<Row className='mt-3'>
+				<Col xs={4}>
+					{!isActive ? (
+						<Button outline color='secondary' onClick={handleShowCreate}>
+							Show Create
+						</Button>
+					) : null}
+					{isActive ? (
+						<Button outline color='warning' onClick={handleHideCreate}>
+							Hide Create
+						</Button>
+					) : null}
+					{!isActiveCateg ? (
+						<Button
+							outline
+							color='success'
+							className='ml-4'
+							onClick={handleShowCateg}
+						>
+							Add Category
+						</Button>
+					) : null}
+					{isActiveCateg ? (
+						<Button
+							outline
+							color='danger'
+							className='ml-4'
+							onClick={handleHideCateg}
+						>
+							Cancel
+						</Button>
+					) : null}
+				</Col>
+				<Col xs={4} className='mx-auto mt-5'>
+					{isActiveCateg ? (
+						<Form onSubmit={(e) => handleCategSubmit(e)}>
+							<FormGroup>
+								<Label for='createCategory'>New Category</Label>
+								<Input
+									type='text'
+									name='category'
+									id='createCategory'
+									placeholder='Write a category...'
+									onChange={(e) => handleCategInput(e)}
+								/>
+							</FormGroup>
+							<Button>Save</Button>
+						</Form>
+					) : null}
+				</Col>				
+			</Row>
+			
+			
+		</div>
+	);
 }
 
 export default TodosList;
