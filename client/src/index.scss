@@ -52,3 +52,9 @@ body {
 .list-group {
 	flex-direction: row;
 }
+
+tbody tr:hover {
+	color: white !important;
+	transition: 0.5s;
+	cursor: pointer;
+}

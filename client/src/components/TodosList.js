@@ -29,7 +29,6 @@ function TodosList(props) {
 	const [todoResponsible, setTodoResponsible] = useState('');
 	const [todoPriority, setTodoPriority] = useState('');
 	const [todoCompleted, setTodoCompleted] = useState(false);
-	// const [deleteCateg, setDeleteCateg] = useState(false);
 	const [todoCreated, setTodoCreated] = useState(false);
 	const [todoEliminated, setTodoEliminated] = useState(false);
 	const [emptyCateg, setEmptyCateg] = useState(false);
@@ -249,7 +248,7 @@ function TodosList(props) {
 							<Alert className='w-50 mt-3 mx-auto animated fadeIn' color='danger'>Todo deleted successfully!</Alert>
 					) : null}
 					<h3 className='mt-4'>ToDos List</h3>
-					<Table className='mt-4 text-white'>
+					<Table responsive hover className='mt-4 text-white'>
 						<thead>
 							<tr>
 								<th>Description</th>

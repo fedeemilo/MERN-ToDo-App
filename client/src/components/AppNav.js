@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from '../leon.svg';
+import logo from '../portapapeles.png';
 import { Navbar, NavbarBrand, Nav, NavItem, NavLink } from 'reactstrap';
 
 class AppNav extends Component {
