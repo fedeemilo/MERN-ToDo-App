@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import AppDropdown from './AppDropdown';
 import {
 	Table,
 	Row,
@@ -114,12 +113,6 @@ function TodosList(props) {
 	// Handle the submittion of Todo Creation
 	async function onSubmit(e) {
 		e.preventDefault();
-		// Communication with the backend
-		// create newTodo object
-		console.log(todoDescription);
-		console.log(todoResponsible);
-		console.log(todoPriority);
-		console.log(todoCompleted);
 		const newTodo = {
 			todo_description: todoDescription,
 			todo_responsible: todoResponsible,

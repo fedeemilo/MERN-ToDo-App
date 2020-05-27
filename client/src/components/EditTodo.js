@@ -17,21 +17,16 @@ function EditTodo(todos) {
 	const [todoPriority, setTodoPriority] = useState('');
 	const [todoCompleted, setTodoCompleted] = useState(false);
 
-	console.log(todos.params);
-
 	useEffect(() => {
+		async function fetchTodo() {
+			let todoEdit = await axios.get('/todos/' + todos.match.params.id);
+			setTodoDescription(todoEdit.data.todo_description);
+			setTodoResponsible(todoEdit.data.todo_responsible);
+			setTodoPriority(todoEdit.data.todo_priority);
+			setTodoCompleted(todoEdit.data.todo_completed);
+		}
 		fetchTodo();
-	}, []);
-
-	async function fetchTodo() {
-
-		let todoEdit = await axios.get('/todos/' + todos.match.params.id);
-		setTodoDescription(todoEdit.data.todo_description);
-		setTodoResponsible(todoEdit.data.todo_responsible);
-		setTodoPriority(todoEdit.data.todo_priority);
-		setTodoCompleted(todoEdit.data.todo_completed);
-
-	}
+	}, [todos.match.params.id]);
 
 	function onChangeTodoDescription(e) {
 		setTodoDescription(e.target.value);
@@ -46,7 +41,7 @@ function EditTodo(todos) {
 	}
 
 	function onChangeTodoCompleted(e) {
-		setTodoCompleted(e.target.value);
+		setTodoCompleted(!todoCompleted);
 	}
 
 	function onSubmit(e) {
@@ -57,6 +52,7 @@ function EditTodo(todos) {
 			todo_priority: todoPriority,
 			todo_completed: todoCompleted
 		};
+
 		axios
 			.put('/todos/update/' + todos.match.params.id, obj)
 			.then((res) => console.log(res.data))
@@ -145,7 +141,7 @@ function EditTodo(todos) {
 							/>
 						</FormGroup>
 						<FormGroup className=' float-right'>
-							<Button color='secondary'>Edit</Button>
+							<Button color='secondary' type='submit'>Edit</Button>
 						</FormGroup>
 					</Form>
 				</Col>
