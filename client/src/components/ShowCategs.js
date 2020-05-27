@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, ListGroup, Alert, ListGroupItem, Badge } from 'reactstrap';
+import {
+	Row,
+	Col,
+	ListGroup,
+	Alert,
+	ListGroupItem,
+	Badge,
+	Card,
+	CardTitle,
+	CardText,
+	Button,
+} from 'reactstrap';
 import axios from 'axios';
 
 function ShowCategs() {
 	const [categories, setCategories] = useState([]);
-    const [emptyCateg, setEmptyCateg] = useState(false);
-    
-    useEffect(() => {
-        fetchCategories()
-    }, []);
+	const [emptyCateg, setEmptyCateg] = useState(false);
 
-	// Fetch the Categories 
+	useEffect(() => {
+		fetchCategories();
+	}, []);
+
+	// Fetch the Categories
 	async function fetchCategories() {
 		await axios
 			.get('/categories/')
@@ -27,17 +38,27 @@ function ShowCategs() {
 	function listCategories() {
 		return categories.map((categ) => {
 			return (
-				<ListGroupItem key={categ._id} className='categorie-list-element'>
-					{categ.categorie_name}
-					<Badge
-						color='secondary'
-						id={categ._id}
-						onClick={(e) => handleCategDelete(e)}
-						className='float-right c-pointer'
+				<Col>
+					<Card
+						body
+						inverse
+						style={{ backgroundColor: '#333', borderColor: '#333' }}
+						key={categ._id}
+						className='categorie-list-element'
 					>
-						X
-					</Badge>
-				</ListGroupItem>
+						<CardTitle>{categ.categorie_name}</CardTitle>
+						<Badge
+							color='secondary'
+							id={categ._id}
+							onClick={(e) => handleCategDelete(e)}
+							className='float-right c-pointer'
+						>
+							X
+						</Badge>
+	
+						<Button color='secondary'>Open</Button>
+					</Card>
+				</Col>
 			);
 		});
 	}
@@ -60,33 +81,35 @@ function ShowCategs() {
 	return (
 		<div>
 			<h4 className='mt-3 mb-3 text-center'>Categories</h4>
-			<Row>
-				<Col xs={12}>
-					{categories.length > 0 ? (
-						<ListGroup className='text-dark list-categ w-75 mx-auto'>
-							{listCategories()}
-						</ListGroup>
-					) : (
-						<ListGroup className='text-dark'>
+			<Row className='mt-5'>
+		
+					<Col xs={12}>
+						{categories.length > 0 ? (
+							<Row>
+								{listCategories()}
+							</Row>
+						) : (
+							<ListGroup className='text-dark'>
+								<Alert
+									color='info'
+									style={{ transition: '2s' }}
+									className='mx-auto mt-4'
+								>
+									There are no categories
+								</Alert>
+							</ListGroup>
+						)}
+						{emptyCateg ? (
 							<Alert
-								color='info'
+								color='warning'
 								style={{ transition: '2s' }}
-								className='mx-auto mt-4'
+								className='mx-auto mt-1'
 							>
-								There are no categories
+								The category input cannot be empty!
 							</Alert>
-						</ListGroup>
-					)}
-					{emptyCateg ? (
-						<Alert
-							color='warning'
-							style={{ transition: '2s' }}
-							className='mx-auto mt-1'
-						>
-							The category input cannot be empty!
-						</Alert>
-					) : null}
-				</Col>
+						) : null}
+					</Col>
+			
 			</Row>
 		</div>
 	);

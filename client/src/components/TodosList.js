@@ -14,7 +14,8 @@ import {
 	ListGroupItem,
 	Alert,
 	Badge,
-	CustomInput
+	CustomInput,
+
 } from 'reactstrap';
 
 function TodosList(props) {
@@ -95,8 +96,6 @@ function TodosList(props) {
 				console.log(err);
 				return null;
 			});
-
-		
 	}
 	// Handle input of Todo Description
 	function onChangeTodoDescription(e) {
@@ -117,7 +116,7 @@ function TodosList(props) {
 			todo_description: todoDescription,
 			todo_responsible: todoResponsible,
 			todo_priority: todoPriority,
-			todo_completed: todoCompleted
+			todo_completed: todoCompleted,
 		};
 
 		await axios
@@ -136,10 +135,6 @@ function TodosList(props) {
 		setTimeout(() => {
 			setTodoCreated(false);
 		}, 2000);
-
-		setTimeout(() => {
-			refreshPage();
-		}, 2000);
 	}
 	// List the todos inside a table
 	function listTodos() {
@@ -154,7 +149,7 @@ function TodosList(props) {
 			);
 		});
 	}
-	
+
 	// Show the Create Todo form
 	function handleShowCreate() {
 		setIsActive(true);
@@ -189,7 +184,7 @@ function TodosList(props) {
 		// Creo el objeto categoría
 		const categ = {
 			categorie_name: newCateg,
-			categorie_todos: categorieTodos
+			categorie_todos: categorieTodos,
 		};
 
 		// Utilizo axios para agregar la categoría a la base de datos
@@ -224,21 +219,20 @@ function TodosList(props) {
 			setTodoEliminated(false);
 		}, 2000);
 	}
-	
-	// Refresh the page
-	function refreshPage() {
-		window.location.reload(false);
-	}
 
 	return (
 		<div>
 			<Row>
 				<Col className='col-mide-6' xs={colSize}>
 					{todoCreated ? (
-							<Alert className='mt-3'  color='success'>New Todo added successfully!</Alert>
+						<Alert className='mt-3' color='success'>
+							New Todo added successfully!
+						</Alert>
 					) : null}
 					{todoEliminated ? (
-							<Alert className='w-50 mt-3 mx-auto animated fadeIn' color='danger'>Todo deleted successfully!</Alert>
+						<Alert className='w-50 mt-3 mx-auto animated fadeIn' color='danger'>
+							Todo deleted successfully!
+						</Alert>
 					) : null}
 					<h3 className='mt-4'>ToDos List</h3>
 					<Table responsive hover className='mt-4 text-white'>
@@ -376,10 +370,8 @@ function TodosList(props) {
 							<Button>Save</Button>
 						</Form>
 					) : null}
-				</Col>				
+				</Col>
 			</Row>
-			
-			
 		</div>
 	);
 }

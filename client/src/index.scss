@@ -24,20 +24,18 @@ body {
 
 .c-pointer {
 	position: relative;
-	top: 3.5px;
-	left: 5px;
-
+	top: -3.2rem;
+	left: 96%;
+	width: 10% !important;
 	&:hover {
 		cursor: pointer;
-		background: red;
+		background: rgb(216, 50, 50);
+		transition: 1s;
 	}
 }
 
 .categorie-list-element {
-	&:hover {
-		opacity: 0.7;
-		cursor: pointer;
-	}
+
 }
 
 .arrDown {

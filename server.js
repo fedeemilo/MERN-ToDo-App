@@ -4,13 +4,11 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 
-
-
 // Importar variables de entorno
 
 require('dotenv').config({
 	silent: process.env.NODE_ENV === 'production',
-	path: './variables.env'
+	path: './variables.env',
 });
 
 console.log(process.env.DB_URL);
@@ -27,9 +25,9 @@ app.use(bodyParser.json());
 console.log(process.env.MONGODB_URI);
 
 // connect to database
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/todos', {
+mongoose.connect('mongodb://localhost:27017/todos', {
 	useNewUrlParser: true,
-	useUnifiedTopology: true
+	useUnifiedTopology: true,
 });
 const connection = mongoose.connection;
 
@@ -54,8 +52,6 @@ if (process.env.NODE_ENV === 'production') {
 // Leer localhost de variables y puerto
 const host = process.env.HOST;
 const port = process.env.PORT || 4000;
-
-
 
 // listen to port
 app.listen(port, host, () => {

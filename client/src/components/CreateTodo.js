@@ -136,7 +136,7 @@ class CreateTodo extends Component {
 								</div>
 							</FormGroup>
 							<FormGroup className='mt-4 float-right'>
-								<Button color='secondary'>Create</Button>
+								<Button type='submitw' color='secondary'>Create</Button>
 							</FormGroup>
 						</Form>
 					</Col>
